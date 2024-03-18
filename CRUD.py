@@ -67,6 +67,33 @@ def deleteStudent(student_id):
     except Exception as e:
         print("Deleting failed,", e)
 
+#Setup
+conn = psycopg2.connect(database="A3",
+                host="localhost",
+                user="postgres",
+                password="postgres",
+                port="5432")
+cursor = conn.cursor()
+#Creates the student table if it doesn't exists
+cursor.execute("""CREATE TABLE IF NOT EXISTS Students (
+                    student_id SERIAL PRIMARY KEY,
+                    first_name TEXT NOT NULL,
+                    last_name TEXT NOT NULL,
+                    email TEXT NOT NULL UNIQUE,
+                    enrollment_date DATE
+                );""")
+conn.commit()
+#Inserts the initial data if the table is empty
+cursor.execute(f"SELECT * FROM STUDENTS")
+if len(cursor.fetchall()) == 0:
+    cursor.execute("""INSERT INTO students (first_name, last_name, email, enrollment_date) VALUES
+                    ('John', 'Doe', 'john.doe@example.com', '2023-09-01'),
+                    ('Jane', 'Smith', 'jane.smith@example.com', '2023-09-01'),
+                    ('Jim', 'Beam', 'jim.beam@example.com', '2023-09-02');""")
+conn.commit()
+cursor.close()
+conn.close()
+
 while True:
     print('')
     print("To quit press 0")
